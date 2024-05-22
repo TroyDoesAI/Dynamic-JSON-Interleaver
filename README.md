@@ -11,6 +11,8 @@ The Dynamic JSON Interleaver is a Python application utilizing PyQt5 for its gra
 - **User-Friendly Interface**: Simple GUI for loading files and executing the interleaving process.
 - **Robust Error Handling**: Manages file loading errors and JSON formatting issues gracefully.
 
+![Interleave GIF](Interleave.gif)
+
 ## Installation
 Ensure Python and PyQt5 are installed on your system:
 ```bash
