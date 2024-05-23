@@ -1,7 +1,7 @@
 import sys
 import json
 import random
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QScrollArea, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QScrollArea, QMessageBox, QComboBox
 
 class InterleaveApp(QMainWindow):
     def __init__(self):
@@ -27,9 +27,14 @@ class InterleaveApp(QMainWindow):
         self.btn_interleave = QPushButton('Interleave JSON Files')
         self.btn_interleave.clicked.connect(self.interleave_json)
 
+        self.algorithm_combo = QComboBox()
+        self.algorithm_combo.addItem('Weighted Interleave')
+        self.algorithm_combo.addItem('Even Distribution')
+
         self.main_layout.addWidget(QLabel('Welcome to Dynamic JSON Interleaver!'))
         self.main_layout.addWidget(self.scroll_area)
         self.main_layout.addWidget(self.btn_add_file)
+        self.main_layout.addWidget(self.algorithm_combo)
         self.main_layout.addWidget(self.btn_interleave)
 
         central_widget = QWidget()
@@ -55,7 +60,11 @@ class InterleaveApp(QMainWindow):
             return
 
         try:
-            interleaved_data = self.weighted_interleave(self.json_data.copy())
+            algorithm = self.algorithm_combo.currentText()
+            if algorithm == 'Weighted Interleave':
+                interleaved_data = self.weighted_interleave(self.json_data.copy())
+            elif algorithm == 'Even Distribution':
+                interleaved_data = self.even_interleave(self.json_data.copy())
             self.save_interleaved(interleaved_data)
         except Exception as e:
             QMessageBox.critical(self, "Interleaving Error", f"An error occurred during interleaving: {e}")
@@ -73,6 +82,14 @@ class InterleaveApp(QMainWindow):
             total_items -= 1
             active_indices = [i for i in active_indices if len(datasets[i]) > 0]
 
+        return interleaved_data
+
+    def even_interleave(self, datasets):
+        interleaved_data = []
+        while any(datasets):
+            for data in datasets:
+                if data:
+                    interleaved_data.append(data.pop(0))
         return interleaved_data
 
     def save_interleaved(self, interleaved_data):
