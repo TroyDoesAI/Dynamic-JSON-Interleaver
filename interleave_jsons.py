@@ -7,6 +7,7 @@ class InterleaveApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.json_data = []
+        self.json_paths = []  # Keep track of JSON file paths
         self.labels = []
         self.initUI()
 
@@ -24,6 +25,10 @@ class InterleaveApp(QMainWindow):
 
         self.btn_add_file = QPushButton('Add JSON File')
         self.btn_add_file.clicked.connect(self.add_json_file)
+        
+        self.btn_clear_files = QPushButton('Clear JSON Files')
+        self.btn_clear_files.clicked.connect(self.clear_json_files)
+        
         self.btn_interleave = QPushButton('Interleave JSON Files')
         self.btn_interleave.clicked.connect(self.interleave_json)
 
@@ -34,6 +39,7 @@ class InterleaveApp(QMainWindow):
         self.main_layout.addWidget(QLabel('Welcome to Dynamic JSON Interleaver!'))
         self.main_layout.addWidget(self.scroll_area)
         self.main_layout.addWidget(self.btn_add_file)
+        self.main_layout.addWidget(self.btn_clear_files)
         self.main_layout.addWidget(self.algorithm_combo)
         self.main_layout.addWidget(self.btn_interleave)
 
@@ -48,11 +54,21 @@ class InterleaveApp(QMainWindow):
                 with open(filename, 'r', encoding='utf-8') as file:  # Ensuring UTF-8 encoding
                     data = json.load(file)
                     self.json_data.append(data)
+                    self.json_paths.append(filename)  # Save the path
                     label = QLabel(f'Loaded: {filename}')
                     self.labels.append(label)
                     self.scroll_widget.layout().addWidget(label)
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to load file: {e}")
+
+    def clear_json_files(self):
+        self.json_data.clear()
+        self.json_paths.clear()  # Clear the paths
+        for label in self.labels:
+            self.scroll_widget.layout().removeWidget(label)
+            label.deleteLater()
+        self.labels.clear()
+        QMessageBox.information(self, "Cleared", "All loaded JSON files have been cleared.")
 
     def interleave_json(self):
         if len(self.json_data) < 2:
